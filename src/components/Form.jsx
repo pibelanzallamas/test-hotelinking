@@ -8,6 +8,8 @@ import {
   InputLeftAddon,
   InputRightElement,
   Link,
+  FormErrorMessage,
+  FormControl,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { alerts } from "../utils/alerts";
@@ -24,25 +26,25 @@ function Form({ register }) {
   const dispatch = useDispatch();
 
   const handleLogin = async () => {
-    const user = { email: "brandon", id: "1" };
-    dispatch(setUser(user));
-    navigate("/home");
     try {
-      const user = await axios.post("http://localhost:3000/api/users/login", {
+      const user = await axios.post("http://localhost:3000/users.php", {
+        login: true, // Añade este campo
         email,
         password,
       });
-
-      if (user.data) {
-        dispatch(setUser(user.data.payload));
-        alerts("Success!", "You have logged in successfully", "success");
+      if (user.data.status === "success") {
+        // Comprueba el estado en la respuesta
+        dispatch(setUser(user.data)); // O ajusta según tu estructura
+        alerts("Success!", user.data.message, "success");
         navigate("/home");
+      } else {
+        alerts("Sorry!", user.data.message, "warning");
       }
     } catch (er) {
       console.log(er);
       alerts(
         "Sorry!",
-        "You couldn't be logged in successfully, try again!",
+        "Ocurrió un error al intentar iniciar sesión.",
         "warning"
       );
     }
@@ -50,26 +52,21 @@ function Form({ register }) {
 
   const handleRegister = async () => {
     try {
-      const user = await axios.post(
-        "http://localhost:3000/api/users/register",
-        {
-          email,
-          password,
-          nombre,
-        }
-      );
-
-      if (user.data) {
-        alerts(
-          `Success ${user.data.name}!`,
-          `You have registered successfully`,
-          "success"
-        );
+      const user = await axios.post("http://localhost:3000/users.php", {
+        register: true,
+        email,
+        password,
+        nombre,
+      });
+      if (user.data.status === "success") {
+        alerts(`Success ${nombre}!`, user.data.message, "success");
         navigate("/");
+      } else {
+        alerts("Sorry!", user.data.message, "warning");
       }
     } catch (e) {
       console.log(e);
-      alerts("Sorry!", "You couldn't register, try again!", "warning");
+      alerts("Sorry!", "Ocurrió un error al intentar registrarte.", "warning");
     }
   };
 
@@ -80,50 +77,56 @@ function Form({ register }) {
 
       <Stack spacing={3}>
         {register && (
+          <FormControl isInvalid={nombre === ""}>
+            <InputGroup>
+              <InputLeftAddon>Nombre</InputLeftAddon>
+              <Input
+                onChange={(e) => {
+                  setNombre(e.target.value);
+                }}
+                value={nombre}
+                variant="outline"
+                placeholder="Natalia"
+                autoComplete="off"
+              />
+              <FormErrorMessage>Email is required.</FormErrorMessage>
+            </InputGroup>
+          </FormControl>
+        )}
+
+        <FormControl isInvalid={email === ""}>
           <InputGroup>
-            <InputLeftAddon>Nombre</InputLeftAddon>
+            <InputLeftAddon>Email</InputLeftAddon>
             <Input
               onChange={(e) => {
-                setNombre(e.target.value);
+                setEmail(e.target.value);
               }}
-              value={nombre}
+              value={email}
               variant="outline"
-              placeholder="Natalia"
+              placeholder="nataliarodriguez@email.com"
               autoComplete="off"
             />
           </InputGroup>
-        )}
+        </FormControl>
 
-        <InputGroup>
-          <InputLeftAddon>Email</InputLeftAddon>
-          <Input
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-            value={email}
-            variant="outline"
-            placeholder="nataliarodriguez@email.com"
-            autoComplete="off"
-          />
-        </InputGroup>
-
-        <InputGroup size="md">
-          <InputLeftAddon>Password</InputLeftAddon>
-          <Input
-            pr="4.5rem"
-            type={show ? "text" : "password"}
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            placeholder="1234"
-            autoComplete="off"
-          />
-          <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
-              {show ? "Hide" : "Show"}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-
+        <FormControl isInvalid={password === ""}>
+          <InputGroup size="md">
+            <InputLeftAddon>Password</InputLeftAddon>
+            <Input
+              pr="4.5rem"
+              type={show ? "text" : "password"}
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              placeholder="1234"
+              autoComplete="off"
+            />
+            <InputRightElement width="4.5rem">
+              <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+                {show ? "Hide" : "Show"}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
         {register ? (
           <>
             <Button colorScheme="blue" onClick={handleRegister}>
