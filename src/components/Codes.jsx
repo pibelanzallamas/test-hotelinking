@@ -23,7 +23,7 @@ function Codes() {
   useEffect(() => {
     const checkAllCodes = async () => {
       try {
-        const resp = axios.get("http://localhost:3000/api/codes");
+        const resp = axios.get("http://localhost:3000/api/codes?all");
 
         if (resp.data) {
           setCodes(resp.data);
@@ -43,7 +43,9 @@ function Codes() {
 
   const handleCheckOne = async (code) => {
     try {
-      const resp = await axios.put(`http://localhost:3000/api/codes/${code}`);
+      const resp = await axios.put(
+        `http://localhost:3000/api/codes?code=${code}`
+      );
 
       if (resp.data) {
         alerts("Success!", "You have checked the code correctly", "success");
