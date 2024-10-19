@@ -16,6 +16,7 @@ import { alerts } from "../utils/alerts";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUser } from "../state/userState";
+import { ssrModuleExportsKey } from "vite/runtime";
 
 function Form({ register }) {
   const [show, setShow] = useState(false);
@@ -28,29 +29,30 @@ function Form({ register }) {
   const handleLogin = async () => {
     try {
       const user = await axios.post("http://localhost:3000/users.php", {
-        login: true, // Añade este campo
+        login: true,
         email,
         password,
       });
-      if (user.data.status === "success") {
-        // Comprueba el estado en la respuesta
-        dispatch(setUser(user.data)); // O ajusta según tu estructura
-        alerts("Success!", user.data.message, "success");
+
+      if (user.data.user) {
+        const suc = user.data.user;
+        dispatch(setUser({ name: suc.name, email: suc.email, id: suc.id }));
+        alerts("Success!", "You have logged in correctly.", "success");
         navigate("/home");
       } else {
-        alerts("Sorry!", user.data.message, "warning");
+        alerts("Sorry!", "You couldn't logged in correctly.", "warning");
       }
     } catch (er) {
-      console.log(er);
-      alerts(
-        "Sorry!",
-        "Ocurrió un error al intentar iniciar sesión.",
-        "warning"
-      );
+      console.log("err", er);
+      alerts("Sorry!", "You couldn't logged in correctly.", "warning");
     }
+    setEmail("");
+    setNombre("");
+    setPassword("");
   };
 
   const handleRegister = async () => {
+    //intentamos una peticion post con los datos para registrarse
     try {
       const user = await axios.post("http://localhost:3000/users.php", {
         register: true,
@@ -58,16 +60,19 @@ function Form({ register }) {
         password,
         nombre,
       });
-      if (user.data.status === "success") {
-        alerts(`Success ${nombre}!`, user.data.message, "success");
+      if (user.data.user.id) {
+        alerts(`Success!`, "You have registered correctly.", "success");
         navigate("/");
       } else {
-        alerts("Sorry!", user.data.message, "warning");
+        alerts("Sorry!", "You couldn't registered correctly", "warning");
       }
     } catch (e) {
       console.log(e);
-      alerts("Sorry!", "Ocurrió un error al intentar registrarte.", "warning");
+      alerts("Sorry!", "You couldn't registered correctly", "warning");
     }
+    setEmail("");
+    setNombre("");
+    setPassword("");
   };
 
   return (

@@ -3,9 +3,11 @@ import { Heading, Button } from "@chakra-ui/react";
 import ProductCard from "../commons/ProductCard";
 import { cards } from "../utils/cards";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Home() {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
 
   function handleToTop() {
     const refe = document.getElementById("top");
