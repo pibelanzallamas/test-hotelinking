@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Button, Heading } from "@chakra-ui/react";
-// import { codes } from "../utils/codes";
 import { Checkbox } from "@chakra-ui/react";
 import {
   Table,
@@ -29,6 +28,7 @@ function Codes() {
       .catch((err) => console.log(err));
   }, [estado]);
 
+  //chequear un codigo promocion
   const handleCheckOne = async (code) => {
     try {
       const resp = await axios.post("http://localhost:3000/codes.php", {
@@ -48,6 +48,7 @@ function Codes() {
     }
   };
 
+  //chequear todos los codigos promociones
   const handleCheckAll = async () => {
     try {
       const resp = await axios.post("http://localhost:3000/codes.php", {

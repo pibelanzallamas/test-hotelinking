@@ -19,7 +19,7 @@ function ProductCard({ texto, titulo, precio, imagen, isUser }) {
   const [promoted, setPromoted] = useState();
   const user = useSelector((state) => state.user);
 
-  //registra los codigos generados
+  //crea el código de un producto en la base de datos
   const handleActivate = async () => {
     let codigo = "";
     const abecedario = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
@@ -49,7 +49,7 @@ function ProductCard({ texto, titulo, precio, imagen, isUser }) {
     }
   };
 
-  //chequea si ese producto tiene codigo
+  //chequea si ese producto ya tiene código
   useEffect(() => {
     axios
       .post("http://localhost:3000/codes.php", {

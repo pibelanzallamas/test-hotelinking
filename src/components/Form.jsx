@@ -24,6 +24,31 @@ function Form({ register }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  //función para registrar usuario
+  const handleRegister = async () => {
+    try {
+      const user = await axios.post("http://localhost:3000/users.php", {
+        register: true,
+        email,
+        password,
+        nombre,
+      });
+      if (user.data.user.id) {
+        alerts(`Success!`, "You have registered correctly.", "success");
+        navigate("/");
+      } else {
+        alerts("Sorry!", "You couldn't registered correctly", "warning");
+      }
+    } catch (e) {
+      console.log(e);
+      alerts("Sorry!", "You couldn't registered correctly", "warning");
+    }
+    setEmail("");
+    setNombre("");
+    setPassword("");
+  };
+
+  //función para loguear usuario
   const handleLogin = async () => {
     try {
       const user = await axios.post("http://localhost:3000/users.php", {
@@ -43,29 +68,6 @@ function Form({ register }) {
     } catch (er) {
       console.log("err", er);
       alerts("Sorry!", "You couldn't logged in correctly.", "warning");
-    }
-    setEmail("");
-    setNombre("");
-    setPassword("");
-  };
-
-  const handleRegister = async () => {
-    try {
-      const user = await axios.post("http://localhost:3000/users.php", {
-        register: true,
-        email,
-        password,
-        nombre,
-      });
-      if (user.data.user.id) {
-        alerts(`Success!`, "You have registered correctly.", "success");
-        navigate("/");
-      } else {
-        alerts("Sorry!", "You couldn't registered correctly", "warning");
-      }
-    } catch (e) {
-      console.log(e);
-      alerts("Sorry!", "You couldn't registered correctly", "warning");
     }
     setEmail("");
     setNombre("");

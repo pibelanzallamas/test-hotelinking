@@ -10,12 +10,14 @@ function Home() {
   const user = useSelector((state) => state.user);
   const logged = user.id ? true : false;
 
+  //función para ir arriba de todo
   function handleToTop() {
     const refe = document.getElementById("top");
     if (refe) {
       refe.scrollIntoView({ behavior: "smooth" });
     }
   }
+
   return (
     <div id="top">
       <Heading>Hotel Linking</Heading>

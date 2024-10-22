@@ -7,6 +7,7 @@ import Codes from "../components/Codes";
 function AppRoutes() {
   return (
     <Routes>
+      //rutas de las distintas páginas
       <Route path="/" element={<Form register={false} />} />
       <Route path="/register" element={<Form register={true} />} />
       <Route path="/home" element={<Home />} />
