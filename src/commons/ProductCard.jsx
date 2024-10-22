@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Image,
@@ -10,20 +10,17 @@ import {
   Code,
 } from "@chakra-ui/react";
 import { alerts } from "../utils/alerts";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
-// disfruta su compania
-function ProductCard({ texto, titulo, precio, imagen }) {
+function ProductCard({ texto, titulo, precio, imagen, isUser }) {
   const [activated, setActivated] = useState(false);
   const [code, setCode] = useState("");
+  const [promoted, setPromoted] = useState();
+  const user = useSelector((state) => state.user);
 
-  //esta codeado?
-  function handleSearchCode() {
-    //con el titulo buscar un codigo con ese titulo
-    //si hay: mostrar el codigo correspondiente de la bd
-    //si no: no hacer nada
-  }
-
-  function handleActivate() {
+  //registra los codigos generados
+  const handleActivate = async () => {
     let codigo = "";
     const abecedario = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 
@@ -33,12 +30,41 @@ function ProductCard({ texto, titulo, precio, imagen }) {
     }
 
     setCode(codigo);
-    alerts("Succes!", "The promo-code was generated!", "success");
 
-    // crear fila en base de datos con -codigo, titulo y un state false y un usuario.id-
+    try {
+      const resp = await axios.post("http://localhost:3000/codes.php", {
+        uid: user.id,
+        title: titulo,
+        price: parseFloat(precio.replace("$", "")),
+        code: codigo,
+        state: false,
+        create: true,
+      });
 
-    setActivated(true);
-  }
+      setActivated(true);
+      alerts("Succes!", "The promo-code was generated!", "success");
+    } catch (e) {
+      console.log(e);
+      alerts("Sorry!", "The promo-code couldn't be generated!", "success");
+    }
+  };
+
+  //chequea si ese producto tiene codigo
+  useEffect(() => {
+    axios
+      .post("http://localhost:3000/codes.php", {
+        title: titulo,
+        uid: user.id,
+        checkTitle: true,
+      })
+      .then((promo) => {
+        if (promo.data.promo.id) {
+          setActivated(true);
+          setPromoted(promo.data.promo.code);
+        }
+      })
+      .catch((e) => console.log(e));
+  }, []);
 
   return (
     <div>
@@ -59,16 +85,19 @@ function ProductCard({ texto, titulo, precio, imagen }) {
           <br />
           {activated ? (
             <Text>
-              Your code is: <Code>{code}</Code>
+              {/* //muestra el promocionado o el activado */}
+              Your code is: <Code>{code || promoted}</Code>
             </Text>
           ) : (
-            <Button
-              onClick={() => handleActivate()}
-              variant="solid"
-              colorScheme="blue"
-            >
-              Get Code!
-            </Button>
+            isUser && (
+              <Button
+                onClick={() => handleActivate()}
+                variant="solid"
+                colorScheme="blue"
+              >
+                Get Code!
+              </Button>
+            )
           )}
         </CardBody>
       </Card>

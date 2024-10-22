@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 function Home() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const logged = user.id ? true : false;
 
   function handleToTop() {
     const refe = document.getElementById("top");
@@ -31,6 +32,7 @@ function Home() {
       {cards.map((pro, i) => (
         <ProductCard
           key={i}
+          isUser={logged}
           texto={pro.texto}
           precio={pro.precio}
           imagen={pro.imagen}

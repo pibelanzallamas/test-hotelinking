@@ -8,7 +8,6 @@ import {
   InputLeftAddon,
   InputRightElement,
   Link,
-  FormErrorMessage,
   FormControl,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +15,6 @@ import { alerts } from "../utils/alerts";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUser } from "../state/userState";
-import { ssrModuleExportsKey } from "vite/runtime";
 
 function Form({ register }) {
   const [show, setShow] = useState(false);
@@ -52,7 +50,6 @@ function Form({ register }) {
   };
 
   const handleRegister = async () => {
-    //intentamos una peticion post con los datos para registrarse
     try {
       const user = await axios.post("http://localhost:3000/users.php", {
         register: true,
@@ -94,7 +91,6 @@ function Form({ register }) {
                 placeholder="Natalia"
                 autoComplete="off"
               />
-              <FormErrorMessage>Email is required.</FormErrorMessage>
             </InputGroup>
           </FormControl>
         )}
